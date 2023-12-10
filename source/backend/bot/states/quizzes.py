@@ -139,24 +139,51 @@ class StartQuiz(UploadFileState):
         # The prompt template that brings it all together
         prompt_template = PromptTemplate.from_template(
             "From the text {theTextT} generate {number} multiple choice questions with their correct answers "
-            "in {lang}. ответ должен быть в формате json, список объектов. "
+            "in {lang}. ответ должен быть в формате корректного json, список объектов. "
             "Каждый из объектов содержит поле question и answer, response example: [{example}]"
         )
 
         text = getText(self.get_user_file_path(message))
+        if len(text) > 500:
+            text = text[250:400]
+        if len(text) > 300:
+            text = text[100:300]
 
         newnew = prompt_template.format_prompt(
             number=str(user_data.questions_count), theTextT=text, lang=language_text.language_name,
             example='{"question": "some text", "answer": "some text"}'
         )
 
-        print('-----', newnew.to_messages())
+
 
         user_query_output = chat_model(newnew.to_messages())
-        print(')))))))',user_query_output.content)
+
+        print(')))))', user_query_output.content)
         questions: dict = json.loads(user_query_output.content)
 
+
         user_data.questions = questions
+
+        if isinstance(user_data.questions, list) and len(user_data.questions) == 1:
+            if 'questions' in user_data.questions[0]:
+                user_data.questions = user_data.questions[0].get('questions')
+            if 'question1' in user_data.questions[0]:
+                user_data.questions = [
+                    {"question": user_data.questions[0]['question1'], "answer": user_data.questions[0]['answer1']}]
+
+
+
+        if 'questions' in user_data.questions:
+            user_data.questions = user_data.questions.get('questions')
+
+        if 'question1' in user_data.questions:
+            user_data.questions = [{"question": user_data.questions['question1'], "answer": user_data.questions['answer1']}]
+
+        if isinstance(user_data.questions, dict):
+            user_data.questions = [user_data.questions]
+
+        print('((())))))))', user_data.questions)
+
         # user_data.questions = [{'question': 'What is a computer?', 'answer': 'An electronic device that processes data through logical and arithmetic operations.'}, ]
         await self.set_user_date(message, state, user_data)
 
