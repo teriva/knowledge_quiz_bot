@@ -2,6 +2,8 @@
 Your learning companion on Telegram! Upload PDFs for courses in multiple languages. 
 Whether transitioning careers or expanding expertise, simplify your learning journey effortlessly.
 
+[LIVE DEMO](https://t.me/knowledge_quiz_bot)
+
 Key Features:
 
 1. 📑 PDF-Based Learning: Upload your PDF documents, and KnowledgeQuizBot will generate comprehensive educational courses from the content provided, ensuring a seamless learning experience.
