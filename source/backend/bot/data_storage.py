@@ -28,10 +28,11 @@ class Form:
 @dataclass
 class UserData:
     id: int
-    form_data: Form = dataclasses.field(default_factory=Form)
     language_code: str = EnglishText.language_code
     questions_count: int = 10
-    questions: dict = dataclasses.field(default_factory=lambda: defaultdict(dict))
+    questions: list = dataclasses.field(default_factory=dict)
+    current_question: int = 0
+    correct_answers: int = 0
 
     @classmethod
     def from_json(cls, data: str):
@@ -41,11 +42,6 @@ class UserData:
     @classmethod
     def from_dict(cls, data: dict) -> 'UserData':
         user_data = UserData(**data)
-        try:
-            user_data.form_data = Form(**data)
-        except Exception as err:
-            print('=+++++++++', err)
-            user_data.form_data = Form()
         return user_data
 
     def to_json(self) -> str:

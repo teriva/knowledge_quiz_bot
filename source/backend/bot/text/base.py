@@ -26,6 +26,12 @@ class EnglishText:
     star_quiz_message: str = ('All data for creating of the test has been received. '
                               'Wait, we\'re creating a task for you...')
 
+    answer_question: str = 'Answer the question :\n{question}'
+
+    answer_is_correct: str = 'Correct, {more}'
+
+    quiz_completed: str = 'The test is completed, you have answered {correct} out of {all} questions'
+
 
 class RussianText(EnglishText):
     language_name = 'Русский'
@@ -52,3 +58,8 @@ class RussianText(EnglishText):
 
     star_quiz_message: str = 'Все данные для формирования теста получены. Подождите мы создаем для вас задание...'
 
+    answer_question: str = 'Ответьте на вопрос :\n{question}'
+
+    answer_is_correct: str = 'Правильно, {more}'
+
+    quiz_completed: str = 'Тест завершен, вы ответили на {correct} вопросов из {all}'

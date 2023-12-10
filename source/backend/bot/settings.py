@@ -3,6 +3,7 @@ import os
 import re
 from typing import Tuple
 
+from langchain.chat_models.gigachat import GigaChat
 
 LOGGING = {
     "version": 1,
@@ -51,3 +52,8 @@ class Settings:
 
 
 settings = Settings()
+
+chat_model = GigaChat(
+    credentials=settings.gigachat_credential,
+    verify_ssl_certs=False
+)

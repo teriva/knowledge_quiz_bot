@@ -13,7 +13,6 @@ Original file is located at
 
 import PyPDF2
 
-
 # For the questions
 import re
 import json
@@ -28,43 +27,44 @@ from langchain.chat_models.gigachat import GigaChat
 # To parse outputs and get structured data back
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 
+
 def getText(path):
-  text=""
-  with open(path,"rb") as file:
-    pdf=PyPDF2.PdfReader(file)
-    pages=len(pdf.pages)
-    for i in range(pages):
-      page=pdf.pages[i]
-      text+=page.extract_text()
-  return text
-
-def generate_test(file_path, questions_num, language_code, credential)->list:
-  response_schemas = [
-    ResponseSchema(name="question", description="A multiple choice question generated from input text snippet."),
-    ResponseSchema(name="options", description="Possible choices for the multiple choice question."),
-    ResponseSchema(name="answer", description="Correct answer for the question.")
-  ]
-
-  # The parser that will look for the LLM output in my schema and return it back to me
-  output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
-
-  # The format instructions that LangChain makes. Let's look at them
-  format_instructions = output_parser.get_format_instructions()
+    text = ""
+    with open(path, "rb") as file:
+        pdf = PyPDF2.PdfReader(file)
+        pages = len(pdf.pages)
+        for i in range(pages):
+            page = pdf.pages[i]
+            text += page.extract_text()
+    return text
 
 
-  chat_model = GigaChat(
-    credentials=credential,
-    verify_ssl_certs=False
+def generate_test(file_path, questions_num, language_code, credential) -> list:
+    response_schemas = [
+        ResponseSchema(name="question", description="A multiple choice question generated from input text snippet."),
+        ResponseSchema(name="options", description="Possible choices for the multiple choice question."),
+        ResponseSchema(name="answer", description="Correct answer for the question.")
+    ]
+
+    # The parser that will look for the LLM output in my schema and return it back to me
+    output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+
+    # The format instructions that LangChain makes. Let's look at them
+    format_instructions = output_parser.get_format_instructions()
+
+    chat_model = GigaChat(
+        credentials=credential,
+        verify_ssl_certs=False
     )
 
-  # The prompt template that brings it all together
-  prompt_template = PromptTemplate.from_template(
-    "From the text {theTextT} generate {number} multiple choice questions with their correct answers in {lang} in JSON format"
+
+    # The prompt template that brings it all together
+    prompt_template = PromptTemplate.from_template(
+        "From the text {theTextT} generate {number} multiple choice questions with their correct answers in {lang} in JSON format"
     )
 
-  text = getText(file_path)
-  newnew=prompt_template.format_prompt(number=str(questions_num), theTextT=text, lang=language_code)
-  user_query_output = chat_model(newnew.to_messages())
-  return user_query_output.content, text
-
-
+    text = getText(file_path)
+    newnew = prompt_template.format_prompt(number=str(questions_num), theTextT=text, lang=language_code)
+    messages = newnew.to_messages()
+    user_query_output = chat_model(messages)
+    return user_query_output.content, text
