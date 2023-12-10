@@ -72,19 +72,29 @@ class UploadFileState(BaseCustomState):
 
         await self.download_file(message)
 
+        user_data.current_question = 0
+        user_data.questions_count = 5
+        await self.set_user_date(message, state, user_data)
+
         await message.bot.send_message(message.chat.id, language_text.document_loaded)
-        await BaseCustomState.set_state(message=message, state=state, new_state=Quizzes.set_questions_count)
+        await BaseCustomState.set_state(message=message, state=state, new_state=Quizzes.start_quiz)
 
 
 class SetQuestionsCount(UploadFileState):
     async def init(self, message: types.Message, state: Optional[FSMContext]):
         user_data: UserData = await self.get_user_data(message, state)
         language_text: Optional[EnglishText] = languages.get_by_code(user_data.language_code)
-        await message.bot.send_message(
-            message.chat.id, language_text.set_questions_count_message, reply_markup=await self.get_keyboard(language_text)
-        )
+
+        user_data.current_question = 0
+        user_data.questions_count = 5
+
+        await self.set_user_date(message, state, user_data)
+
+        await BaseCustomState.set_state(message=message, state=state, new_state=Quizzes.start_quiz)
 
     async def processing(self, message: types.Message, state: Optional[FSMContext]):
+        await BaseCustomState.set_state(message=message, state=state, new_state=Quizzes.start_quiz)
+        return
         from bot.states import Initial
         user_data: UserData = await self.get_user_data(message, state)
         language_text: Optional[EnglishText] = languages.get_by_code(user_data.language_code)
@@ -135,7 +145,6 @@ class StartQuiz(UploadFileState):
         # The format instructions that LangChain makes. Let's look at them
         format_instructions = output_parser.get_format_instructions()
 
-
         # The prompt template that brings it all together
         prompt_template = PromptTemplate.from_template(
             "From the text {theTextT} generate {number} multiple choice questions with their correct answers "
@@ -154,13 +163,10 @@ class StartQuiz(UploadFileState):
             example='{"question": "some text", "answer": "some text"}'
         )
 
-
-
         user_query_output = chat_model(newnew.to_messages())
 
         print(')))))', user_query_output.content)
         questions: dict = json.loads(user_query_output.content)
-
 
         user_data.questions = questions
 
@@ -170,8 +176,6 @@ class StartQuiz(UploadFileState):
             if 'question1' in user_data.questions[0]:
                 user_data.questions = [
                     {"question": user_data.questions[0]['question1'], "answer": user_data.questions[0]['answer1']}]
-
-
 
         if 'questions' in user_data.questions:
             user_data.questions = user_data.questions.get('questions')
