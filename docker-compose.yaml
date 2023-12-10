@@ -1,0 +1,21 @@
+version: '3'
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: devops/docker/bot.Dockerfile
+    volumes:
+      - ./storage:/app/storage
+    restart: always
+    env_file:
+      .env
+    networks:
+      - net
+    command:
+      python3 run.py
+networks:
+  net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.128.0/24

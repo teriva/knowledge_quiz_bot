@@ -33,7 +33,6 @@ class KnowledgeBot:
         dp.include_router(states_router)
         dp.include_router(start_router)
 
-
     async def on_startup(self, dispatcher: Dispatcher):
         pass
 
