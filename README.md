@@ -35,7 +35,7 @@ Setup environment variables. Fill in all the variables in the source/backend/exa
     
     set -o allexport; source source/backend/example.env; set +o allexport
 
-Rub bot:
+Run bot:
     
     cd source/backend
     python3 run.py
